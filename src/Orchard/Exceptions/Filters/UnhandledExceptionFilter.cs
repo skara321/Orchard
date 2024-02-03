@@ -53,9 +53,17 @@ namespace Orchard.Exceptions.Filters {
                             shape.Message = filterContext.Exception.Message;
                             shape.Exception = filterContext.Exception;
 
-                            filterContext.Result = new ShapeResult(filterContext.Controller, shape);
+                            //If action is child action don't render layout just use partial view
+                            if (filterContext.IsChildAction)
+                            {
+                                filterContext.Result = new ShapePartialResult(filterContext.Controller, shape);
+                            }
+                            else
+                            {
+                                filterContext.Result = new ShapeResult(filterContext.Controller, shape);
+                            }
+                            
                             filterContext.RequestContext.HttpContext.Response.StatusCode = 500;
-
                             // prevent IIS 7.0 classic mode from handling the 404/500 itself
                             filterContext.RequestContext.HttpContext.Response.TrySkipIisCustomErrors = true;
                         }
